@@ -253,6 +253,118 @@
       text-shadow: 0 0 8px rgba(255,159,67,0.5);
     }
 
+    .controls-row {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    .ctrl-btn {
+      background: transparent;
+      border: 1px solid #444;
+      color: var(--text-muted);
+      font-family: 'Arial', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.45rem 1.1rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .ctrl-btn:hover { border-color: var(--gold-mid); color: var(--gold-light); }
+    .ctrl-btn.active { border-color: #ff9f43; color: #ff9f43; background: rgba(255,159,67,0.08); }
+
+    .speed-row {
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+    .speed-label, .speed-val {
+      font-family: 'Arial', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .speed-val { min-width: 2rem; }
+    .speed-slider {
+      -webkit-appearance: none;
+      width: 90px; height: 3px;
+      background: #444; border-radius: 2px; outline: none;
+    }
+    .speed-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 13px; height: 13px;
+      border-radius: 50%; background: var(--gold-mid); cursor: pointer;
+    }
+
+    .bo3-panel {
+      margin-top: 1rem;
+      background: var(--surface);
+      border: 0.5px solid #333;
+      border-radius: var(--radius);
+      padding: 1.2rem 1.8rem;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.7rem;
+      min-width: 230px;
+      display: none;
+    }
+    .bo3-title {
+      font-family: 'Arial', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .bo3-pick { display: flex; gap: 0.5rem; align-items: center; }
+    .bo3-pick > span {
+      font-family: 'Arial', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .bo3-pick-btn {
+      background: transparent;
+      font-family: 'Arial', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.85rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .bo3-pick-btn.heads { border: 1px solid #555; color: var(--gold-light); }
+    .bo3-pick-btn.heads:hover { border-color: var(--gold-mid); }
+    .bo3-pick-btn.tails { border: 1px solid #555; color: var(--silver-light); }
+    .bo3-pick-btn.tails:hover { border-color: var(--silver-mid); }
+    .bo3-score {
+      display: flex; gap: 1rem; align-items: center;
+      font-family: 'Arial', sans-serif; font-size: 0.85rem; letter-spacing: 0.08em;
+    }
+    .bo3-score .vs { color: var(--text-muted); font-size: 0.6rem; }
+    .bo3-status {
+      font-family: 'Arial', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      min-height: 1rem;
+      text-align: center;
+    }
+    .bo3-cancel {
+      background: transparent; border: none;
+      color: var(--text-muted);
+      font-family: 'Arial', sans-serif;
+      font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
+      cursor: pointer; padding: 0.2rem; transition: color 0.2s;
+    }
+    .bo3-cancel:hover { color: #ff6b6b; }
+
     /* Login */
     #login-screen {
       display: flex;
@@ -403,6 +515,31 @@
 
   <button class="flip-btn" id="flipBtn" onclick="flipCoin()">Flip the coin</button>
 
+  <div class="controls-row">
+    <button class="ctrl-btn" id="autoBtn" onclick="toggleAutoFlip()">Auto Flip</button>
+    <button class="ctrl-btn" id="bo3Btn" onclick="startBo3()">Best of 3</button>
+  </div>
+  <div class="speed-row" id="speedRow">
+    <span class="speed-label">Interval</span>
+    <input type="range" class="speed-slider" id="speedSlider" min="1.5" max="6" step="0.5" value="2" oninput="updateAutoSpeed(this.value)">
+    <span class="speed-val" id="speedVal">2s</span>
+  </div>
+  <div class="bo3-panel" id="bo3Panel">
+    <div class="bo3-title">Best of 3</div>
+    <div class="bo3-pick" id="bo3Pick">
+      <span>Pick:</span>
+      <button class="bo3-pick-btn heads" onclick="pickBo3Side('heads')">Heads</button>
+      <button class="bo3-pick-btn tails" onclick="pickBo3Side('tails')">Tails</button>
+    </div>
+    <div class="bo3-score" id="bo3Score" style="display:none">
+      <span id="bo3YouScore">You 0</span>
+      <span class="vs">vs</span>
+      <span id="bo3HouseScore">House 0</span>
+    </div>
+    <div class="bo3-status" id="bo3Status"></div>
+    <button class="bo3-cancel" onclick="cancelBo3()">✕ cancel</button>
+  </div>
+
   <div class="result hidden" id="result">—</div>
 
   <div class="stats">
@@ -473,6 +610,92 @@
       }
     });
 
+    // ── Auto Flip ──────────────────────────────────────────────────
+    let autoInterval = null;
+    let autoDelay = 2000;
+
+    function toggleAutoFlip() {
+      if (bo3Active) return;
+      const autoBtn = document.getElementById('autoBtn');
+      const speedRow = document.getElementById('speedRow');
+      if (autoInterval) {
+        clearInterval(autoInterval);
+        autoInterval = null;
+        autoBtn.classList.remove('active');
+        autoBtn.textContent = 'Auto Flip';
+        speedRow.style.display = 'none';
+        btn.style.display = '';
+      } else {
+        autoBtn.classList.add('active');
+        autoBtn.textContent = 'Stop Auto';
+        speedRow.style.display = 'flex';
+        btn.style.display = 'none';
+        autoInterval = setInterval(() => { if (!btn.disabled) flipCoin(); }, autoDelay);
+      }
+    }
+
+    function updateAutoSpeed(val) {
+      autoDelay = parseFloat(val) * 1000;
+      document.getElementById('speedVal').textContent = val + 's';
+      if (autoInterval) {
+        clearInterval(autoInterval);
+        autoInterval = setInterval(() => { if (!btn.disabled) flipCoin(); }, autoDelay);
+      }
+    }
+
+    // ── Best of 3 ──────────────────────────────────────────────────
+    let bo3Active = false, bo3Choice = null, bo3Done = 0, bo3You = 0, bo3House = 0;
+
+    function startBo3() {
+      if (autoInterval) return;
+      bo3Active = true; bo3Choice = null; bo3Done = 0; bo3You = 0; bo3House = 0;
+      const panel = document.getElementById('bo3Panel');
+      panel.style.display = 'flex';
+      document.getElementById('bo3Pick').style.display = 'flex';
+      document.getElementById('bo3Score').style.display = 'none';
+      document.getElementById('bo3Status').textContent = '';
+      document.getElementById('bo3YouScore').textContent = 'You 0';
+      document.getElementById('bo3HouseScore').textContent = 'House 0';
+      btn.style.display = 'none';
+      document.getElementById('autoBtn').style.display = 'none';
+      document.getElementById('bo3Btn').style.display = 'none';
+    }
+
+    function pickBo3Side(side) {
+      bo3Choice = side;
+      document.getElementById('bo3Pick').style.display = 'none';
+      document.getElementById('bo3Score').style.display = 'flex';
+      document.getElementById('bo3Status').textContent = 'Flip 1 of 3…';
+      setTimeout(flipCoin, 400);
+    }
+
+    function handleBo3Result(isHeads) {
+      const side = isHeads ? 'heads' : 'tails';
+      bo3Done++;
+      if (side === bo3Choice) bo3You++; else bo3House++;
+      document.getElementById('bo3YouScore').textContent = `You ${bo3You}`;
+      document.getElementById('bo3HouseScore').textContent = `House ${bo3House}`;
+
+      if (bo3You >= 2 || bo3House >= 2 || bo3Done >= 3) {
+        const msg = bo3You > bo3House ? 'You win! 🎉' : bo3You < bo3House ? 'House wins.' : 'Draw!';
+        document.getElementById('bo3Status').textContent = msg;
+        if (bo3You > bo3House) launchConfetti();
+        setTimeout(cancelBo3, 2600);
+      } else {
+        document.getElementById('bo3Status').textContent = `Flip ${bo3Done + 1} of 3…`;
+        setTimeout(flipCoin, 700);
+      }
+    }
+
+    function cancelBo3() {
+      bo3Active = false;
+      document.getElementById('bo3Panel').style.display = 'none';
+      btn.style.display = '';
+      document.getElementById('autoBtn').style.display = '';
+      document.getElementById('bo3Btn').style.display = '';
+    }
+
+    // ── Core flip ──────────────────────────────────────────────────
     function flipCoin() {
       if (btn.disabled) return;
       btn.disabled = true;
@@ -507,19 +730,15 @@
         histEl.appendChild(dot);
         if (histEl.children.length > 60) histEl.removeChild(histEl.firstChild);
 
-        // Streak tracking
         const side = isHeads ? 'heads' : 'tails';
-        if (side === lastResult) {
-          streak++;
-        } else {
-          streak = 1;
-          lastResult = side;
-        }
+        if (side === lastResult) { streak++; } else { streak = 1; lastResult = side; }
         updateStreakBadge(streak, side);
         if (streak >= 5) launchConfetti();
 
         coin.classList.remove('flipping');
         btn.disabled = false;
+
+        if (bo3Active && bo3Choice) handleBo3Result(isHeads);
       }, 1200);
     }
 
@@ -530,7 +749,7 @@
       streakBadge.className = 'streak-badge' + (n >= 5 ? ' hot' : '');
     }
 
-    // Confetti
+    // ── Confetti ───────────────────────────────────────────────────
     const canvas = document.getElementById('confetti-canvas');
     const ctx = canvas.getContext('2d');
     let confettiParticles = [], confettiFrame = null;
@@ -541,16 +760,11 @@
       const colors = ['#F5C842','#ff6b6b','#48dbfb','#ff9f43','#a29bfe','#55efc4','#fdcb6e'];
       for (let i = 0; i < 120; i++) {
         confettiParticles.push({
-          x: Math.random() * canvas.width,
-          y: -10 - Math.random() * 40,
-          w: 6 + Math.random() * 6,
-          h: 10 + Math.random() * 6,
+          x: Math.random() * canvas.width, y: -10 - Math.random() * 40,
+          w: 6 + Math.random() * 6, h: 10 + Math.random() * 6,
           color: colors[Math.floor(Math.random() * colors.length)],
-          rot: Math.random() * Math.PI * 2,
-          rotSpeed: (Math.random() - 0.5) * 0.15,
-          vx: (Math.random() - 0.5) * 3,
-          vy: 2.5 + Math.random() * 3,
-          alpha: 1,
+          rot: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.15,
+          vx: (Math.random() - 0.5) * 3, vy: 2.5 + Math.random() * 3, alpha: 1,
         });
       }
       if (!confettiFrame) animateConfetti();
@@ -562,10 +776,8 @@
       confettiParticles.forEach(p => {
         p.x += p.vx; p.y += p.vy; p.rot += p.rotSpeed;
         if (p.y > canvas.height * 0.75) p.alpha -= 0.03;
-        ctx.save();
-        ctx.globalAlpha = p.alpha;
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rot);
+        ctx.save(); ctx.globalAlpha = p.alpha;
+        ctx.translate(p.x, p.y); ctx.rotate(p.rot);
         ctx.fillStyle = p.color;
         ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
         ctx.restore();
@@ -580,6 +792,8 @@
 
     function resetStats() {
       heads = 0; tails = 0; streak = 0; lastResult = null;
+      if (autoInterval) toggleAutoFlip();
+      if (bo3Active) cancelBo3();
       document.getElementById('headsCount').textContent = '0';
       document.getElementById('tailsCount').textContent = '0';
       document.getElementById('totalCount').textContent = '0';
