@@ -252,9 +252,139 @@
       color: #ff9f43;
       text-shadow: 0 0 8px rgba(255,159,67,0.5);
     }
+
+    /* Login */
+    #login-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      width: 100%;
+      padding: 2rem 1rem;
+    }
+
+    #coin-app { display: none; }
+
+    .login-card {
+      background: var(--surface);
+      border: 0.5px solid #333;
+      border-radius: var(--radius);
+      padding: 2.5rem 2.5rem 2rem;
+      width: 100%;
+      max-width: 340px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .login-coin-icon {
+      font-size: 2.4rem;
+      margin-bottom: 0.6rem;
+      line-height: 1;
+    }
+
+    .login-title {
+      font-size: 1.3rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 0.2rem;
+    }
+
+    .login-subtitle {
+      font-family: 'Arial', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1.8rem;
+    }
+
+    .login-field {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    .login-field label {
+      display: block;
+      font-family: 'Arial', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .login-field input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Georgia', serif;
+      font-size: 0.95rem;
+      padding: 0.6rem 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .login-field input:focus {
+      border-color: var(--gold-mid);
+    }
+
+    .login-error {
+      font-family: 'Arial', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: #ff6b6b;
+      min-height: 1.1rem;
+      margin-bottom: 0.8rem;
+      text-align: center;
+    }
+
+    .login-btn {
+      width: 100%;
+      background: transparent;
+      border: 1.5px solid var(--gold-mid);
+      color: var(--gold-light);
+      font-family: 'Arial', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 0.75rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.1s;
+      margin-top: 0.2rem;
+    }
+
+    .login-btn:hover { background: rgba(213,160,23,0.12); }
+    .login-btn:active { transform: scale(0.97); }
   </style>
 </head>
 <body>
+  <div id="login-screen">
+    <div class="login-card">
+      <div class="login-coin-icon">☀</div>
+      <div class="login-title">Coin Flip</div>
+      <div class="login-subtitle">Members only</div>
+      <div class="login-field">
+        <label for="username">Username</label>
+        <input type="text" id="username" autocomplete="username" spellcheck="false" />
+      </div>
+      <div class="login-field">
+        <label for="password">Password</label>
+        <input type="password" id="password" autocomplete="current-password" />
+      </div>
+      <div class="login-error" id="login-error"></div>
+      <button class="login-btn" onclick="attemptLogin()">Enter</button>
+    </div>
+  </div>
+
+  <div id="coin-app">
   <h1>Coin Flip</h1>
   <p class="subtitle">Chance in motion</p>
 
@@ -297,6 +427,34 @@
   <div class="streak-badge" id="streakBadge"></div>
   <button class="reset-btn" onclick="resetStats()">↺ Reset stats</button>
   <canvas id="confetti-canvas"></canvas>
+  </div><!-- end #coin-app -->
+
+  <script>
+    function attemptLogin() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      if (user === 'penny' && pass === 'nickel') {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('coin-app').style.display = 'flex';
+        document.getElementById('coin-app').style.flexDirection = 'column';
+        document.getElementById('coin-app').style.alignItems = 'center';
+        document.getElementById('coin-app').style.justifyContent = 'center';
+        document.getElementById('coin-app').style.minHeight = '100vh';
+        document.getElementById('coin-app').style.padding = '2rem 1rem';
+      } else {
+        const err = document.getElementById('login-error');
+        err.textContent = 'Invalid username or password.';
+        document.getElementById('password').value = '';
+        document.getElementById('password').focus();
+      }
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.code === 'Enter' && document.getElementById('login-screen').offsetParent !== null) {
+        attemptLogin();
+      }
+    });
+  </script>
 
   <script>
     let heads = 0, tails = 0, streak = 0, lastResult = null;
@@ -306,9 +464,10 @@
     const histEl = document.getElementById('history');
     const streakBadge = document.getElementById('streakBadge');
 
-    // Spacebar shortcut
+    // Spacebar shortcut (only when coin app is visible)
     document.addEventListener('keydown', e => {
-      if (e.code === 'Space' && !btn.disabled) {
+      if (e.code === 'Space' && !btn.disabled
+          && document.getElementById('coin-app').offsetParent !== null) {
         e.preventDefault();
         flipCoin();
       }
